@@ -1,0 +1,24 @@
+# Setup data dir
+data_dir = "/opt/nomad"
+
+# Enable the client
+client {
+  enabled = true
+
+  server_join {
+    retry_join = ["${control_ipv4}:4647"]
+  }
+}
+
+# Require TLS
+tls {
+  http = true
+  rpc  = true
+
+  ca_file   = "/certs/nomad-agent-ca.pem"
+  cert_file = "/certs/global-client-nomad.pem"
+  key_file  = "/certs/global-client-nomad-key.pem"
+
+  verify_server_hostname = true
+  verify_https_client    = true
+}

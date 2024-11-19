@@ -1,0 +1,22 @@
+data_dir = "/opt/consul"
+encrypt = "${consul_encryption_key}"
+
+tls {
+  defaults {
+    ca_file = "/certs/consul-agent-ca.pem"
+    cert_file = "/certs/dc1-server-consul-0.pem"
+    key_file = "/certs/dc1-server-consul-0-key.pem"
+
+    verify_incoming = true
+    verify_outgoing = true
+  }
+  internal_rpc {
+    verify_server_hostname = true
+  }
+}
+
+bind_addr = "${bind_ipv4}"
+
+auto_encrypt {
+  allow_tls = true
+}
