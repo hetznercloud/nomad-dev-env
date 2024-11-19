@@ -2,11 +2,11 @@
 terraform {
   required_providers {
     hcloud = {
-      source = "hetznercloud/hcloud"
+      source  = "hetznercloud/hcloud"
       version = "~> 1.45"
     }
     external = {
-      source = "hashicorp/external"
+      source  = "hashicorp/external"
       version = "2.3.4"
     }
   }

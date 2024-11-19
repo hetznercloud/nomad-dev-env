@@ -11,72 +11,72 @@ resource "terraform_data" "certificates" {
 }
 
 data "external" "consul_keygen" {
-  program = [ "bash", abspath("${path.module}/scripts/generate-consul-key.sh") ]
+  program = ["bash", abspath("${path.module}/scripts/generate-consul-key.sh")]
 }
 
 
 resource "terraform_data" "setup-control" {
   connection {
-    host = hcloud_server.control.ipv4_address
+    host        = hcloud_server.control.ipv4_address
     private_key = tls_private_key.ssh.private_key_openssh
   }
 
   provisioner "remote-exec" {
-    inline = [ "mkdir /certs" ]
+    inline = ["mkdir /certs"]
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/nomad.service")
+    source      = abspath("${path.module}/nomad.service")
     destination = "/etc/systemd/system/nomad.service"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/consul.service")
+    source      = abspath("${path.module}/consul.service")
     destination = "/etc/systemd/system/consul.service"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/nomad-agent-ca.pem")
+    source      = abspath("${path.root}/files/nomad-agent-ca.pem")
     destination = "/certs/nomad-agent-ca.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/global-server-nomad.pem")
+    source      = abspath("${path.root}/files/global-server-nomad.pem")
     destination = "/certs/global-server-nomad.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/global-server-nomad-key.pem")
+    source      = abspath("${path.root}/files/global-server-nomad-key.pem")
     destination = "/certs/global-server-nomad-key.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/consul-agent-ca.pem")
+    source      = abspath("${path.root}/files/consul-agent-ca.pem")
     destination = "/certs/consul-agent-ca.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/dc1-server-consul-0.pem")
+    source      = abspath("${path.root}/files/dc1-server-consul-0.pem")
     destination = "/certs/dc1-server-consul-0.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/dc1-server-consul-0-key.pem")
+    source      = abspath("${path.root}/files/dc1-server-consul-0-key.pem")
     destination = "/certs/dc1-server-consul-0-key.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/setup-docker.sh")
+    source      = abspath("${path.module}/scripts/setup-docker.sh")
     destination = "./setup-docker.sh"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/setup-nomad.sh")
+    source      = abspath("${path.module}/scripts/setup-nomad.sh")
     destination = "./setup-nomad.sh"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/setup-consul.sh")
+    source      = abspath("${path.module}/scripts/setup-consul.sh")
     destination = "./setup-consul.sh"
   }
 
@@ -99,7 +99,7 @@ resource "terraform_data" "setup-control" {
 
   provisioner "file" {
     content = templatefile(abspath("${path.module}/templates/consul-control.hcl.tftpl"), {
-      bind_ipv4 = hcloud_server.control.ipv4_address
+      bind_ipv4             = hcloud_server.control.ipv4_address
       consul_encryption_key = data.external.consul_keygen.result["result"]
     })
     destination = "/etc/consul.d/consul.hcl"
@@ -123,60 +123,60 @@ resource "terraform_data" "setup-control" {
 }
 
 resource "terraform_data" "setup-worker" {
-  depends_on = [ terraform_data.setup-control ]
-  for_each = { for idx, worker in hcloud_server.worker : idx => worker }
+  depends_on = [terraform_data.setup-control]
+  for_each   = { for idx, worker in hcloud_server.worker : idx => worker }
 
   connection {
-    host = each.value.ipv4_address
+    host        = each.value.ipv4_address
     private_key = tls_private_key.ssh.private_key_openssh
   }
 
   provisioner "remote-exec" {
-    inline = [ "mkdir /certs" ]
+    inline = ["mkdir /certs"]
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/nomad.service")
+    source      = abspath("${path.module}/nomad.service")
     destination = "/etc/systemd/system/nomad.service"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/consul.service")
+    source      = abspath("${path.module}/consul.service")
     destination = "/etc/systemd/system/consul.service"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/nomad-agent-ca.pem")
+    source      = abspath("${path.root}/files/nomad-agent-ca.pem")
     destination = "/certs/nomad-agent-ca.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/global-client-nomad.pem")
+    source      = abspath("${path.root}/files/global-client-nomad.pem")
     destination = "/certs/global-client-nomad.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/global-client-nomad-key.pem")
+    source      = abspath("${path.root}/files/global-client-nomad-key.pem")
     destination = "/certs/global-client-nomad-key.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.root}/files/consul-agent-ca.pem")
+    source      = abspath("${path.root}/files/consul-agent-ca.pem")
     destination = "/certs/consul-agent-ca.pem"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/setup-docker.sh")
+    source      = abspath("${path.module}/scripts/setup-docker.sh")
     destination = "./setup-docker.sh"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/setup-nomad.sh")
+    source      = abspath("${path.module}/scripts/setup-nomad.sh")
     destination = "./setup-nomad.sh"
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/setup-consul.sh")
+    source      = abspath("${path.module}/scripts/setup-consul.sh")
     destination = "./setup-consul.sh"
   }
 
@@ -200,8 +200,8 @@ resource "terraform_data" "setup-worker" {
   provisioner "file" {
     content = templatefile(abspath("${path.module}/templates/consul-worker.hcl.tftpl"), {
       consul_encryption_key = data.external.consul_keygen.result["result"]
-      bind_ipv4 = each.value.ipv4_address
-      control_ipv4 = hcloud_server.control.ipv4_address
+      bind_ipv4             = each.value.ipv4_address
+      control_ipv4          = hcloud_server.control.ipv4_address
     })
     destination = "/etc/consul.d/consul.hcl"
   }
@@ -217,7 +217,7 @@ resource "terraform_data" "setup-worker" {
 }
 
 resource "terraform_data" "environment" {
-  depends_on = [ hcloud_server.control ]
+  depends_on = [hcloud_server.control]
 
   provisioner "local-exec" {
     command = "sed 's/REPLACE_IPV4/${hcloud_server.control.ipv4_address}/' ${abspath("${path.module}/templates/env.sh.tftpl")} > ${abspath("${path.root}/files/env.sh")}"
@@ -238,7 +238,7 @@ resource "terraform_data" "environment" {
 
 resource "terraform_data" "cleanup" {
   provisioner "local-exec" {
-    when = destroy
+    when    = destroy
     command = "rm -r ${abspath("${path.root}/files/")}"
   }
 }
