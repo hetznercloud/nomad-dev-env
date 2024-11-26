@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu -o pipefail
+
 cd $1;
 nomad tls ca create
 nomad tls cert create -server -region global -additional-ipaddress $2;
