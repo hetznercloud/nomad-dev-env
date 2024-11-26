@@ -15,6 +15,15 @@ tls {
   }
 }
 
+ui_config {
+  enabled = true
+}
+
+ports {
+  grpc = 8502
+  grpc_tls = 8503
+}
+
 bind_addr = "${bind_ipv4}"
 
 auto_encrypt {

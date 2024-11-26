@@ -17,6 +17,11 @@ auto_encrypt {
   tls = true
 }
 
+ports {
+  grpc = 8502
+  grpc_tls = 8503
+}
+
 bind_addr = "${bind_ipv4}"
 
 retry_join = ["${control_ipv4}"]
