@@ -16,6 +16,8 @@ data "external" "consul_keygen" {
 
 
 resource "terraform_data" "setup-control" {
+depends_on = [ terraform_data.certificates ]
+
   connection {
     host        = hcloud_server.control.ipv4_address
     private_key = tls_private_key.ssh.private_key_openssh
@@ -123,7 +125,7 @@ resource "terraform_data" "setup-control" {
 }
 
 resource "terraform_data" "setup-worker" {
-  depends_on = [terraform_data.setup-control]
+  depends_on = [terraform_data.setup-control, terraform_data.certificates]
   for_each   = { for idx, worker in hcloud_server.worker : idx => worker }
 
   connection {
