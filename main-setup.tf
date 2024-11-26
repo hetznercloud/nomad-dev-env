@@ -14,9 +14,8 @@ data "external" "consul_keygen" {
   program = ["bash", abspath("${path.module}/scripts/generate-consul-key.sh")]
 }
 
-
 resource "terraform_data" "setup-control" {
-depends_on = [ terraform_data.certificates ]
+  depends_on = [ terraform_data.certificates ]
 
   connection {
     host        = hcloud_server.control.ipv4_address
@@ -82,13 +81,19 @@ depends_on = [ terraform_data.certificates ]
     destination = "./setup-consul.sh"
   }
 
+  provisioner "file" {
+    source = abspath("${path.module}/scripts/install-cni-plugin.sh")
+    destination = "./install-cni-plugin.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "DEBIAN_FRONTEND=noninteractive apt-get update -qq",
       "DEBIAN_FRONTEND=noninteractive apt-get install -qq -y unzip openssl ca-certificates curl",
       "bash ./setup-docker.sh",
       "bash ./setup-consul.sh ${var.consul_version}",
-      "bash ./setup-nomad.sh ${var.nomad_version}"
+      "bash ./setup-nomad.sh ${var.nomad_version}",
+      "bash ./install-cni-plugin.sh ${var.cni_plugin_version}"
     ]
   }
 
@@ -182,13 +187,19 @@ resource "terraform_data" "setup-worker" {
     destination = "./setup-consul.sh"
   }
 
+  provisioner "file" {
+    source = abspath("${path.module}/scripts/install-cni-plugin.sh")
+    destination = "./install-cni-plugin.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "DEBIAN_FRONTEND=noninteractive apt-get update -qq",
       "DEBIAN_FRONTEND=noninteractive apt-get install -qq -y unzip openssl ca-certificates curl",
       "bash ./setup-docker.sh",
       "bash ./setup-consul.sh ${var.consul_version}",
-      "bash ./setup-nomad.sh ${var.nomad_version}"
+      "bash ./setup-nomad.sh ${var.nomad_version}",
+      "bash ./install-cni-plugin.sh ${var.cni_plugin_version}"
     ]
   }
 
