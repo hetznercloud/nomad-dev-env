@@ -21,6 +21,20 @@ resource "hcloud_ssh_key" "tofu" {
   public_key = tls_private_key.ssh.public_key_openssh
 }
 
+# Network
+
+resource "hcloud_network" "cluster" {
+  name     = "cluster"
+  ip_range = "10.0.0.0/8"
+}
+
+resource "hcloud_network_subnet" "cluster" {
+  network_id   = hcloud_network.cluster.id
+  network_zone = "eu-central"
+  type         = "cloud"
+  ip_range     = "10.0.0.0/24"
+}
+
 resource "hcloud_server" "control" {
   name        = "nomad-control"
   image       = "ubuntu-24.04"
@@ -36,6 +50,11 @@ resource "hcloud_server" "control" {
   provisioner "remote-exec" {
     inline = ["cloud-init status --wait || test $? -eq 2"]
   }
+}
+
+resource "hcloud_server_network" "control" {
+  server_id = hcloud_server.control.id
+  subnet_id = hcloud_network_subnet.cluster.id
 }
 
 resource "hcloud_server" "worker" {
@@ -54,4 +73,11 @@ resource "hcloud_server" "worker" {
   provisioner "remote-exec" {
     inline = ["cloud-init status --wait || test $? -eq 2"]
   }
+}
+
+resource "hcloud_server_network" "worker" {
+  count = var.worker_count
+
+  server_id = hcloud_server.worker[count.index].id
+  subnet_id = hcloud_network_subnet.cluster.id
 }

@@ -15,7 +15,9 @@ data "external" "consul_keygen" {
 }
 
 resource "terraform_data" "setup-control" {
-  depends_on = [ terraform_data.certificates ]
+  depends_on = [terraform_data.certificates]
+
+  triggers_replace = [hcloud_server.control.id]
 
   connection {
     host        = hcloud_server.control.ipv4_address
@@ -23,7 +25,7 @@ resource "terraform_data" "setup-control" {
   }
 
   provisioner "remote-exec" {
-    inline = ["mkdir /certs"]
+    inline = ["mkdir -p /certs /etc/systemd/resolved.conf.d /etc/docker"]
   }
 
   provisioner "file" {
@@ -82,12 +84,24 @@ resource "terraform_data" "setup-control" {
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/install-cni-plugin.sh")
+    source      = abspath("${path.module}/scripts/install-cni-plugin.sh")
     destination = "./install-cni-plugin.sh"
+  }
+
+  provisioner "file" {
+    source      = abspath("${path.module}/consul.conf")
+    destination = "/etc/systemd/resolved.conf.d/consul.conf"
+  }
+
+  provisioner "file" {
+    source      = abspath("${path.module}/docker-daemon.json")
+    destination = "/etc/docker/daemon.json"
   }
 
   provisioner "remote-exec" {
     inline = [
+      "#!/bin/bash",
+      "set -eu -o pipefail",
       "DEBIAN_FRONTEND=noninteractive apt-get update -qq",
       "DEBIAN_FRONTEND=noninteractive apt-get install -qq -y unzip openssl ca-certificates curl",
       "bash ./setup-docker.sh",
@@ -121,10 +135,11 @@ resource "terraform_data" "setup-control" {
 
   provisioner "remote-exec" {
     inline = [
-      "systemctl enable consul",
-      "systemctl enable nomad",
-      "systemctl start consul",
-      "systemctl start nomad"
+      "#!/bin/bash",
+      "set -euo pipefail",
+      "systemctl enable --now consul",
+      "systemctl enable --now nomad",
+      "systemctl restart systemd-resolved.service"
     ]
   }
 }
@@ -133,13 +148,15 @@ resource "terraform_data" "setup-worker" {
   depends_on = [terraform_data.setup-control, terraform_data.certificates]
   for_each   = { for idx, worker in hcloud_server.worker : idx => worker }
 
+  triggers_replace = [each.value.id, hcloud_server.control.id]
+
   connection {
     host        = each.value.ipv4_address
     private_key = tls_private_key.ssh.private_key_openssh
   }
 
   provisioner "remote-exec" {
-    inline = ["mkdir /certs"]
+    inline = ["mkdir -p /certs /etc/systemd/resolved.conf.d /etc/docker"]
   }
 
   provisioner "file" {
@@ -188,12 +205,24 @@ resource "terraform_data" "setup-worker" {
   }
 
   provisioner "file" {
-    source = abspath("${path.module}/scripts/install-cni-plugin.sh")
+    source      = abspath("${path.module}/scripts/install-cni-plugin.sh")
     destination = "./install-cni-plugin.sh"
+  }
+
+  provisioner "file" {
+    source      = abspath("${path.module}/consul.conf")
+    destination = "/etc/systemd/resolved.conf.d/consul.conf"
+  }
+
+  provisioner "file" {
+    source      = abspath("${path.module}/docker-daemon.json")
+    destination = "/etc/docker/daemon.json"
   }
 
   provisioner "remote-exec" {
     inline = [
+      "#!/bin/bash",
+      "set -euo pipefail",
       "DEBIAN_FRONTEND=noninteractive apt-get update -qq",
       "DEBIAN_FRONTEND=noninteractive apt-get install -qq -y unzip openssl ca-certificates curl",
       "bash ./setup-docker.sh",
@@ -221,13 +250,42 @@ resource "terraform_data" "setup-worker" {
 
   provisioner "remote-exec" {
     inline = [
-      "systemctl enable consul",
-      "systemctl enable nomad",
-      "systemctl start consul",
-      "systemctl start nomad"
+      "#!/bin/bash",
+      "set -euo pipefail",
+      "systemctl enable --now consul",
+      "systemctl enable --now nomad",
+      "systemctl restart systemd-resolved.service"
     ]
   }
 }
+
+resource "terraform_data" "docker_registry" {
+  depends_on = [terraform_data.setup-control, terraform_data.setup-worker]
+
+  connection {
+    host        = hcloud_server.control.ipv4_address
+    private_key = tls_private_key.ssh.private_key_openssh
+  }
+
+  provisioner "file" {
+    source      = abspath("${path.module}/docker-registry.hcl")
+    destination = "docker-registry.hcl"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "#!/bin/bash",
+      "set -euo pipefail",
+      "export NOMAD_ADDR='https://localhost:4646'",
+      "export NOMAD_CACERT='/certs/nomad-agent-ca.pem'",
+      "export NOMAD_CLIENT_CERT='/certs/global-server-nomad.pem'",
+      "export NOMAD_CLIENT_KEY='/certs/global-server-nomad-key.pem'",
+      "nomad job run docker-registry.hcl"
+    ]
+  }
+}
+
+# Export Files
 
 resource "terraform_data" "environment" {
   depends_on = [hcloud_server.control]
@@ -248,6 +306,17 @@ resource "terraform_data" "environment" {
     command = "sed -i 's/REPLACE_CLIENT_KEY_PATH/${replace(abspath("${path.root}/files/global-cli-nomad-key.pem"), "/", "\\/")}/' ${abspath("${path.root}/files/env.sh")}"
   }
 }
+
+resource "local_file" "registry_port_forward" {
+  content = templatefile(abspath("${path.module}/templates/registry-port-forward.sh.tftpl"), {
+    ssh_id            = abspath("${path.root}/files/id_ed25519")
+    control_ipv4      = hcloud_server.control.ipv4_address
+  })
+  filename        = abspath("${path.root}/files/registry-port-forward.sh")
+  file_permission = "0755"
+}
+
+# Cleanup Files
 
 resource "terraform_data" "cleanup" {
   provisioner "local-exec" {

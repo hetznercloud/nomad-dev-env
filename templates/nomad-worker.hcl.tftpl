@@ -8,6 +8,10 @@ client {
   server_join {
     retry_join = ["${control_ipv4}:4647"]
   }
+
+  host_network "private" {
+    cidr = "10.0.0.0/24"
+  }
 }
 
 # Require TLS
