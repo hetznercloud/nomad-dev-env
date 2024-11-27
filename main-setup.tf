@@ -309,8 +309,8 @@ resource "terraform_data" "environment" {
 
 resource "local_file" "registry_port_forward" {
   content = templatefile(abspath("${path.module}/templates/registry-port-forward.sh.tftpl"), {
-    ssh_id            = abspath("${path.root}/files/id_ed25519")
-    control_ipv4      = hcloud_server.control.ipv4_address
+    ssh_id       = abspath("${path.root}/files/id_ed25519")
+    control_ipv4 = hcloud_server.control.ipv4_address
   })
   filename        = abspath("${path.root}/files/registry-port-forward.sh")
   file_permission = "0755"
