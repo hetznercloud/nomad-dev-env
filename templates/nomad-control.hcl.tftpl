@@ -14,6 +14,12 @@ advertise {
   serf = "${ipv4_addr}"
 }
 
+plugin "docker" {
+  config {
+    allow_privileged = true
+  }
+}
+
 # Require TLS
 tls {
   http = true
