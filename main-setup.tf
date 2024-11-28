@@ -259,7 +259,7 @@ resource "terraform_data" "setup-worker" {
   }
 }
 
-resource "terraform_data" "docker_registry" {
+resource "terraform_data" "nomad_resources" {
   depends_on = [terraform_data.setup-control, terraform_data.setup-worker]
 
   connection {
@@ -280,7 +280,8 @@ resource "terraform_data" "docker_registry" {
       "export NOMAD_CACERT='/certs/nomad-agent-ca.pem'",
       "export NOMAD_CLIENT_CERT='/certs/global-server-nomad.pem'",
       "export NOMAD_CLIENT_KEY='/certs/global-server-nomad-key.pem'",
-      "nomad job run docker-registry.hcl"
+      "nomad job run docker-registry.hcl",
+      "nomad var put secrets/hcloud hcloud_token=${var.hcloud_token}"
     ]
   }
 }
