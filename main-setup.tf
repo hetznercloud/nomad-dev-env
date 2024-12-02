@@ -255,10 +255,10 @@ resource "terraform_data" "nomad_resources" {
 
 resource "local_file" "environment" {
   content = templatefile(abspath("${path.module}/templates/env.sh.tftpl"), {
-    control_ipv4 = hcloud_server.control.ipv4_address
-    nomad_cacert = abspath("${path.root}/files/nomad-agent-ca.pem")
+    control_ipv4      = hcloud_server.control.ipv4_address
+    nomad_cacert      = abspath("${path.root}/files/nomad-agent-ca.pem")
     nomad_client_cert = abspath("${path.root}/files/global-cli-nomad.pem")
-    nomad_client_key = abspath("${path.root}/files/global-cli-nomad-key.pem")
+    nomad_client_key  = abspath("${path.root}/files/global-cli-nomad-key.pem")
   })
   filename = abspath("${path.root}/files/env.sh")
 }
