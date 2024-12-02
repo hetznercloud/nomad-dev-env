@@ -243,6 +243,8 @@ resource "terraform_data" "nomad_resources" {
       "export NOMAD_CACERT='/certs/nomad-agent-ca.pem'",
       "export NOMAD_CLIENT_CERT='/certs/global-server-nomad.pem'",
       "export NOMAD_CLIENT_KEY='/certs/global-server-nomad-key.pem'",
+      // wait for nomad to be up; does not properly work with systemd
+      "while ! nomad server members > /dev/null; do sleep 1; done",
       "nomad job run docker-registry.hcl > /dev/null",
       "nomad var put secrets/hcloud hcloud_token=${var.hcloud_token}"
     ]
