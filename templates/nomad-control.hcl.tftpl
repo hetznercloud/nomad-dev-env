@@ -8,6 +8,14 @@ server {
   heartbeat_grace = "1h"
 }
 
+client {
+  enabled = true
+
+  host_network "private" {
+    cidr = "10.0.0.0/24"
+  }
+}
+
 advertise {
   http = "${ipv4_addr}"
   rpc  = "${ipv4_addr}"

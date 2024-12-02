@@ -15,7 +15,7 @@ variable "cni_plugin_version" {
 }
 
 variable "worker_count" {
-  default = 3
+  default = 1
 }
 
 variable "server_type" {
