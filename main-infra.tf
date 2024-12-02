@@ -37,7 +37,7 @@ resource "hcloud_network_subnet" "cluster" {
 
 resource "hcloud_server" "control" {
   name        = "nomad-control"
-  image       = "ubuntu-24.04"
+  image       = "docker-ce"
   location    = "hel1"
   server_type = var.server_type
   ssh_keys    = [hcloud_ssh_key.tofu.name]
@@ -60,7 +60,7 @@ resource "hcloud_server_network" "control" {
 resource "hcloud_server" "worker" {
   count       = var.worker_count
   name        = "nomad-worker-${count.index}"
-  image       = "ubuntu-24.04"
+  image       = "docker-ce"
   location    = "hel1"
   server_type = var.server_type
   ssh_keys    = [hcloud_ssh_key.tofu.name]
