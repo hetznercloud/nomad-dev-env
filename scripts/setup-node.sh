@@ -9,6 +9,12 @@ DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -qq -y unzip openssl ca-certificates curl
 
+# Docker
+
+# We use the hcloud docker-ce image and therefore need to restart docker after
+# modifying the /etc/docker/daemon.json
+systemctl restart docker
+
 # Consul
 
 curl -o consul.zip https://releases.hashicorp.com/consul/${1}/consul_${1}_linux_amd64.zip
@@ -31,3 +37,4 @@ systemctl enable --now nomad
 
 # Restart after adding consul DNS server
 systemctl restart systemd-resolved.service
+
