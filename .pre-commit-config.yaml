@@ -1,0 +1,50 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: destroyed-symlinks
+
+      - id: check-json
+      - id: check-yaml
+      - id: check-toml
+
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: \.(md|ya?ml)$
+        exclude: ^CHANGELOG.md$
+
+  - repo: local
+    hooks:
+      - id: tofu fmt
+        name: tofu fmt
+        description: Format Terraform files.
+        require_serial: true
+        pass_filenames: false
+        entry: make fmt
+        language: system
+        files: (\.tf|\.tfvars)$
+
+      - id: tofu validate
+        name: tofu validate
+        description: Validates Terraform files.
+        require_serial: true
+        pass_filenames: false
+        entry: make validate
+        language: system
+        files: (\.tf|\.tfvars)$

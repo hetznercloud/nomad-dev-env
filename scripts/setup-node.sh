@@ -37,4 +37,3 @@ systemctl enable --now nomad
 
 # Restart after adding consul DNS server
 systemctl restart systemd-resolved.service
-
