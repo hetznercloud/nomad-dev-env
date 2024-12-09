@@ -17,4 +17,3 @@ variable "worker_count" {
 variable "server_type" {
   default = "cx22"
 }
-

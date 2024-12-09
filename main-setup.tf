@@ -197,7 +197,7 @@ resource "terraform_data" "setup-control" {
 
   provisioner "remote-exec" {
     inline = [
-      "bash ./setup-node.sh ${var.consul_version} ${var.nomad_version} ${var.cni_plugin_version}",
+      "bash ./setup-node.sh ${var.consul_version} ${var.nomad_version}",
     ]
   }
 }
@@ -217,7 +217,7 @@ resource "terraform_data" "setup-worker" {
 
   provisioner "remote-exec" {
     inline = [
-      "bash ./setup-node.sh ${var.consul_version} ${var.nomad_version} ${var.cni_plugin_version}",
+      "bash ./setup-node.sh ${var.consul_version} ${var.nomad_version}",
     ]
   }
 }
