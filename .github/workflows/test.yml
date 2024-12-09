@@ -45,16 +45,16 @@ jobs:
       - uses: hetznercloud/tps-action@main
 
       - name: Swap module source
-        run: sed -i -e 's|source = ".*"|source = "./.."|' example/main.tf
+        run: sed -i -e 's|source = ".*"|source = "./.."|' main.tf
 
       - name: Setup environment
-        run: make -C example up
+        run: make up
 
       - name: Verify environment
         run: |
-          source example/files/env.sh
+          source files/env.sh
           nomad node status
 
       - name: Cleanup
         if: always()
-        run: make -C example down
+        run: make down
