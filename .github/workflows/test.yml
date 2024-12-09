@@ -49,10 +49,10 @@ jobs:
       - name: Setup environment
         run: make up
 
-      - name: Verify environment
+      - name: Verify nodes ready
         run: |
           source files/env.sh
-          nomad node status
+          for status in `nomad node status -json | jq -r .[].Status`; do if [ "$status" != "ready" ]; then false; fi; done;
 
       - name: Cleanup
         if: always()
