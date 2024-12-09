@@ -10,10 +10,6 @@ variable "nomad_version" {
   default = "1.9.3"
 }
 
-variable "cni_plugin_version" {
-  default = "1.5.1"
-}
-
 variable "worker_count" {
   default = 1
 }
@@ -21,3 +17,4 @@ variable "worker_count" {
 variable "server_type" {
   default = "cx22"
 }
+
