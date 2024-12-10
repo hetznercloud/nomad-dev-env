@@ -1,0 +1,26 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: v1.8.7 # renovate: datasource=github-releases depName=opentofu/opentofu
+          tofu_wrapper: false
+
+      - uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files

@@ -1,0 +1,59 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      id-token: write # Required by hetznercloud/tps-action
+
+    defaults:
+      run:
+        working-directory: example
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: v1.8.7 # renovate: datasource=github-releases depName=opentofu/opentofu
+          tofu_wrapper: false
+
+      - uses: hashicorp/setup-nomad@main
+        id: setup
+        with:
+          version: 1.9.3 # renovate: datasource=github-releases depName=hashicorp/nomad
+
+      - name: setup consul binary
+        run: |
+          curl -o consul.zip "https://releases.hashicorp.com/consul/${{ env.CONSUL_VERSION }}/consul_${{ env.CONSUL_VERSION }}_linux_amd64.zip"
+          unzip consul.zip
+          mv consul /usr/local/bin/
+        env:
+          CONSUL_VERSION: 1.20.1 # renovate: datasource=github-releases depName=hashicorp/consul
+
+      - uses: hetznercloud/tps-action@main
+
+      - name: Swap module source
+        run: sed -i -e 's|source = ".*"|source = "./.."|' main.tf
+
+      - name: Setup environment
+        run: make up
+
+      - name: Verify nodes ready
+        run: |
+          source files/env.sh
+          for status in `nomad node status -json | jq -r .[].Status`; do if [ "$status" != "ready" ]; then false; fi; done;
+
+      - name: Cleanup
+        if: always()
+        run: make down

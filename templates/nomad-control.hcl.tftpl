@@ -1,0 +1,42 @@
+# Setup data dir
+data_dir = "/opt/nomad"
+
+# Enable the server
+server {
+  enabled = true
+  bootstrap_expect = 1
+  heartbeat_grace = "1h"
+}
+
+client {
+  enabled = true
+
+  host_network "private" {
+    cidr = "10.0.0.0/24"
+  }
+}
+
+advertise {
+  http = "${ipv4_addr}"
+  rpc  = "${ipv4_addr}"
+  serf = "${ipv4_addr}"
+}
+
+plugin "docker" {
+  config {
+    allow_privileged = true
+  }
+}
+
+# Require TLS
+tls {
+  http = true
+  rpc  = true
+
+  ca_file   = "/certs/nomad-agent-ca.pem"
+  cert_file = "/certs/global-server-nomad.pem"
+  key_file  = "/certs/global-server-nomad-key.pem"
+
+  verify_server_hostname = true
+  verify_https_client    = true
+}

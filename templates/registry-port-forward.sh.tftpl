@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -ue -o pipefail
+
+service="registry-port-forward"
+
+run_systemd() {
+    description="Port Forward for Container Registry"
+
+    cleanup_systemd
+
+    systemd-run --user \
+        --unit="$service.service" \
+        --description="$description" \
+        --same-dir \
+        --collect \
+        ssh -NT \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        -o ServerAliveInterval=60 \
+        -o ExitOnForwardFailure=yes \
+        -i ${ssh_id} \
+        root@${control_ipv4} \
+        -L 30666:docker-registry.service.consul:5000
+}
+
+cleanup_systemd() {
+    systemctl --user stop "$service.service" 2> /dev/null || true
+}
+
+run_launchd() {
+  cleanup_launchd
+
+  launchctl submit \
+    -l "$service" \
+    -p "$(command -v ssh)" \
+    -- ssh -NT \
+      -o StrictHostKeyChecking=no \
+      -o UserKnownHostsFile=/dev/null \
+      -o ServerAliveInterval=60 \
+      -o ExitOnForwardFailure=yes \
+      -i ${ssh_id} \
+      root@${control_ipv4} \
+      -L 30666:docker-registry.service.consul:5000
+}
+
+cleanup_launchd() {
+  launchctl remove "$service" 2> /dev/null || true
+}
+
+help() {
+  cat << EOF >&2
+Usage:
+  $0 up
+  $0 down
+EOF
+  exit 1
+}
+
+case "$${1:-}" in
+  "up")
+    run_systemd
+    ;;
+  "down")
+    cleanup_systemd
+    ;;
+  *)
+    help
+    ;;
+esac
