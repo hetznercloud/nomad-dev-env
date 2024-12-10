@@ -1,10 +1,5 @@
-resource "terraform_data" "make_files_dir" {
-  provisioner "local-exec" {
-    command = "mkdir -p  ${abspath("${path.root}/files/")}"
-  }
-}
-
 resource "terraform_data" "certificates" {
+
   provisioner "local-exec" {
     command = "bash ${abspath("${path.module}/scripts/generate-tls-certs.sh")} ${abspath("${path.root}/files/")} ${hcloud_server.control.ipv4_address}"
   }
