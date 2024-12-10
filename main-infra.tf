@@ -2,6 +2,12 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 
+locals {
+  labels = merge(var.hcloud_labels, {
+    env = var.name
+  })
+}
+
 resource "tls_private_key" "ssh" {
   algorithm = "ED25519"
 }
@@ -17,30 +23,33 @@ resource "local_sensitive_file" "ssh_public" {
 }
 
 resource "hcloud_ssh_key" "tofu" {
-  name       = "tofu"
+  name       = var.name
   public_key = tls_private_key.ssh.public_key_openssh
+  labels     = local.labels
 }
 
 # Network
 
 resource "hcloud_network" "cluster" {
-  name     = "cluster"
+  name     = var.name
   ip_range = "10.0.0.0/8"
+  labels   = local.labels
 }
 
 resource "hcloud_network_subnet" "cluster" {
   network_id   = hcloud_network.cluster.id
-  network_zone = "eu-central"
+  network_zone = var.hcloud_network_zone
   type         = "cloud"
   ip_range     = "10.0.0.0/24"
 }
 
 resource "hcloud_server" "control" {
-  name        = "nomad-control"
+  name        = "${var.name}-control"
   image       = "docker-ce"
-  location    = "hel1"
-  server_type = var.server_type
+  location    = var.hcloud_location
+  server_type = var.hcloud_server_type
   ssh_keys    = [hcloud_ssh_key.tofu.name]
+  labels      = local.labels
 
   connection {
     host        = self.ipv4_address
@@ -59,11 +68,12 @@ resource "hcloud_server_network" "control" {
 
 resource "hcloud_server" "worker" {
   count       = var.worker_count
-  name        = "nomad-worker-${count.index}"
+  name        = "${var.name}-worker-${count.index}"
   image       = "docker-ce"
-  location    = "hel1"
-  server_type = var.server_type
+  location    = var.hcloud_location
+  server_type = var.hcloud_server_type
   ssh_keys    = [hcloud_ssh_key.tofu.name]
+  labels      = local.labels
 
   connection {
     host        = self.ipv4_address
