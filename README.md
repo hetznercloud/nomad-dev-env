@@ -2,6 +2,9 @@
 
 This repository provides an easy way to setup a simple Nomad cluster with self-signed certificates on the Hetzner cloud.
 
+> [!WARNING]
+> This project is not an official Hetzner Cloud Integration and is intended to be used internally. There is no backwards-compatibility promise.
+
 ## Requirements
 
 - [Nomad](https://developer.hashicorp.com/nomad/docs/install)
