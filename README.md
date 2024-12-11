@@ -14,6 +14,9 @@ This repository provides an easy way to setup a simple Nomad cluster with self-s
 
 1. Set the `HCLOUD_TOKEN` environment variable
 
+> [!WARNING]
+> The development environment runs on Hetzner Cloud servers, which will induce costs.
+
 2. Deploy the development cluster:
 
 ```bash
@@ -30,4 +33,10 @@ source example/files/env.sh
 
 ```bash
 nomad node status
+```
+
+⚠️ Do not forget to clean up the development cluster once you are finished:
+
+```sh
+make -C example down
 ```
