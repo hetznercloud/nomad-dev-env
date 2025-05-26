@@ -35,12 +35,11 @@ jobs:
 
       - name: setup consul binary
         run: |
-          export CONSUL_VERSION_TRIMMED=${CONSUL_VERSION#v}
-          curl -o consul.zip "https://releases.hashicorp.com/consul/${CONSUL_VERSION_TRIMMED}/consul_${CONSUL_VERSION_TRIMMED}_linux_amd64.zip"
+          curl -o consul.zip "https://releases.hashicorp.com/consul/${{ env.CONSUL_VERSION }}/consul_${{ env.CONSUL_VERSION }}_linux_amd64.zip"
           unzip consul.zip
           mv consul /usr/local/bin/
         env:
-          CONSUL_VERSION: v1.21.0 # renovate: datasource=github-releases depName=hashicorp/consul
+          CONSUL_VERSION: 1.21.0 # renovate: datasource=github-releases depName=hashicorp/consul extractVersion=v(?<version>.+)
 
       - uses: hetznercloud/tps-action@main
 
