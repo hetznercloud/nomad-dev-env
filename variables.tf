@@ -11,7 +11,7 @@ variable "consul_version" {
 
 variable "nomad_version" {
   description = "Nomad version used for the environment"
-  default     = "1.9.3" # renovate: datasource=github-releases depName=hashicorp/nomad
+  default     = "1.9.3" # renovate: datasource=github-releases depName=hashicorp/nomad extractVersion=v(?<version>.+)
 }
 
 variable "worker_count" {
