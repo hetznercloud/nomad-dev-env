@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.0](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.0)
+
+### Features
+
+- dependency update (#46)
+
 ## [v0.1.0](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.1.0)
 
 We are happy to announce the first release of our nomad development environment. We will use this tool to improve our testing capability in other products, like the csi-driver.
