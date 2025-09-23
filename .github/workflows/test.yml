@@ -39,7 +39,7 @@ jobs:
           unzip consul.zip
           mv consul /usr/local/bin/
         env:
-          CONSUL_VERSION: 1.21.4 # renovate: datasource=github-releases depName=hashicorp/consul extractVersion=v(?<version>.+)
+          CONSUL_VERSION: 1.21.5 # renovate: datasource=github-releases depName=hashicorp/consul extractVersion=v(?<version>.+)
 
       - uses: hetznercloud/tps-action@main
 
