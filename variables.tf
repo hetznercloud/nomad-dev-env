@@ -26,7 +26,7 @@ variable "hcloud_token" {
 
 variable "hcloud_server_type" {
   description = "Hetzner Cloud Server Type used for the environment"
-  default     = "cx22"
+  default     = "cpx22"
 }
 
 variable "hcloud_labels" {
