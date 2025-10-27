@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.1](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.1)
+
+### Bug Fixes
+
+- deprecated server types (#53)
+
 ## [v0.2.0](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.0)
 
 ### Features
