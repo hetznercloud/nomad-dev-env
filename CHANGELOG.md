@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.2](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.2)
+
+### Bug Fixes
+
+- **deps**: update dependency hashicorp/nomad to v1.11.2 (#69)
+
 ## [v0.2.1](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.1)
 
 ### Bug Fixes
