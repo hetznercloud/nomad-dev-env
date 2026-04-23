@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.3](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.3)
+
+### Bug Fixes
+
+- chomp ssh public key (#83)
+
 ## [v0.2.2](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.2)
 
 ### Bug Fixes
