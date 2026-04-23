@@ -24,7 +24,7 @@ resource "local_sensitive_file" "ssh_public" {
 
 resource "hcloud_ssh_key" "tofu" {
   name       = var.name
-  public_key = tls_private_key.ssh.public_key_openssh
+  public_key = chomp(tls_private_key.ssh.public_key_openssh)
   labels     = local.labels
 }
 
