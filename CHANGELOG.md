@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.0](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.3.0)
+
+### Features
+
+- update to nomad v2
+
 ## [v0.2.3](https://github.com/hetznercloud/nomad-dev-env/releases/tag/v0.2.3)
 
 ### Bug Fixes
