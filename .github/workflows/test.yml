@@ -31,7 +31,7 @@ jobs:
       - uses: hashicorp/setup-nomad@daef63d2965093b49089f7ad2ce4d97475817b3d # main
         id: setup
         with:
-          version: 2.0.1 # renovate: datasource=github-releases depName=hashicorp/nomad
+          version: 2.0.2 # renovate: datasource=github-releases depName=hashicorp/nomad
 
       - name: setup consul binary
         run: |
