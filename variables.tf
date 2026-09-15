@@ -6,7 +6,7 @@ variable "name" {
 
 variable "consul_version" {
   description = "Consul version used for the environment"
-  default     = "2.0.3" # renovate: datasource=github-releases depName=hashicorp/consul extractVersion=v(?<version>.+)
+  default     = "2.0.4" # renovate: datasource=github-releases depName=hashicorp/consul extractVersion=v(?<version>.+)
 }
 
 variable "nomad_version" {
